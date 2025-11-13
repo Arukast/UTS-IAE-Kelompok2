@@ -72,6 +72,10 @@ const checkRole = (roles) => {
  * [CONSUMER]
  * POST /:courseId - Mendaftarkan user (dari token) ke sebuah kursus
  */
+/**
+ * [CONSUMER]
+ * POST /:courseId - Mendaftarkan user (dari token) ke sebuah kursus
+ */
 app.post('/:courseId', async (req, res) => {
   let courseTitle = 'kursus'; // default title
   try {
@@ -102,6 +106,24 @@ app.post('/:courseId', async (req, res) => {
       });
     }
     // --- Akhir Logika Consumer 1 ---
+    
+    // --- LOGIKA CONSUMER (Validasi User) ---
+    // Sesuai rencana 
+    try {
+        await axios.get(`${API_GATEWAY_URL}/api/users/${user_id}`, {
+            headers: { Authorization: token }
+        });
+    } catch (error) {
+        if (error.response && error.response.status === 404) {
+            return res.status(404).json({ error: 'User tidak ditemukan' });
+        }
+        return res.status(500).json({ 
+            error: 'Gagal memvalidasi user', 
+            details: error.message 
+        });
+    }
+    // --- Akhir Logika Consumer (Validasi User) ---
+
 
     // Coba daftarkan
     const newEnrollment = await Enrollment.create({

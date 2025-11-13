@@ -16,12 +16,21 @@ app.use(morgan('dev'));
 // --- Database (Sequelize + SQLite) ---
 const sequelize = new Sequelize(process.env.DATABASE_URL);
 
-// Model Course
+// Model Course (TANPA 'price')
 const Course = sequelize.define('Course', {
   id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
   title: { type: DataTypes.STRING, allowNull: false },
   description: { type: DataTypes.TEXT },
-  instructor_id: { type: DataTypes.INTEGER, allowNull: false } // ID dari User Service
+  instructor_id: { type: DataTypes.INTEGER, allowNull: false }, // ID dari User Service
+  thumbnail_url: { 
+    type: DataTypes.STRING, 
+    allowNull: true,
+    defaultValue: 'https://via.placeholder.com/300x200.png?text=Kursus'
+  },
+  category: {
+    type: DataTypes.STRING,
+    allowNull: true
+  }
 }, { tableName: 'courses', timestamps: true });
 
 // Model Module
@@ -49,7 +58,6 @@ Lesson.belongsTo(Module, { foreignKey: 'module_id' });
 
 
 // --- Middleware Otentikasi Sederhana ---
-// Cek header yang dikirim oleh API Gateway
 const checkRole = (roles) => {
   return (req, res, next) => {
     const userRole = req.headers['x-user-role'];
@@ -61,13 +69,12 @@ const checkRole = (roles) => {
 };
 
 // --- Rute (Routes) ---
-// (Semua rute ini akan diakses via /api/courses oleh Gateway)
 
-// POST / (Membuat Kursus baru) - Hanya untuk Instructor/Admin
+// POST / (Membuat Kursus baru) - (TANPA 'price')
 app.post('/', checkRole(['instructor', 'admin']), async (req, res) => {
   try {
-    const { title, description } = req.body;
-    const instructor_id = req.headers['x-user-id']; // Ambil ID instruktur dari token
+    const { title, description, thumbnail_url, category } = req.body;
+    const instructor_id = req.headers['x-user-id'];
 
     if (!title || !description) {
       return res.status(400).json({ error: 'Title dan description diperlukan' });
@@ -76,7 +83,9 @@ app.post('/', checkRole(['instructor', 'admin']), async (req, res) => {
     const newCourse = await Course.create({
       title,
       description,
-      instructor_id
+      instructor_id,
+      thumbnail_url: thumbnail_url,
+      category: category
     });
     res.status(201).json(newCourse);
   } catch (error) {
@@ -119,8 +128,40 @@ app.get('/:id', async (req, res) => {
   }
 });
 
+// PUT /:id (Update Kursus) - (TANPA 'price')
+app.put('/:id', checkRole(['instructor', 'admin']), async (req, res) => {
+  try {
+    const { title, description, thumbnail_url, category } = req.body;
+    const courseId = req.params.id;
+    const requesterId = req.headers['x-user-id'];
+    const requesterRole = req.headers['x-user-role'];
+
+    const course = await Course.findByPk(courseId);
+    if (!course) {
+      return res.status(404).json({ error: 'Kursus tidak ditemukan' });
+    }
+
+    // Validasi kepemilikan
+    if (requesterRole !== 'admin' && course.instructor_id !== parseInt(requesterId)) {
+      return res.status(403).json({ error: 'Akses ditolak. Anda bukan pemilik kursus ini.' });
+    }
+
+    // Lakukan update
+    const updatedCourse = await course.update({
+      title: title || course.title,
+      description: description || course.description,
+      thumbnail_url: thumbnail_url || course.thumbnail_url,
+      category: category || course.category
+    });
+
+    res.json(updatedCourse);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error', details: error.message });
+  }
+});
+
 // ===============================================
-// == FITUR BARU 1: MEMBUAT MODUL BARU (INSTRUKTUR) ==
+// == FITUR MEMBUAT MODUL BARU (INSTRUKTUR) ==
 // ===============================================
 app.post('/:courseId/modules', checkRole(['instructor', 'admin']), async (req, res) => {
   try {
@@ -131,7 +172,6 @@ app.post('/:courseId/modules', checkRole(['instructor', 'admin']), async (req, r
       return res.status(400).json({ error: 'Title dan module_order diperlukan' });
     }
     
-    // Pastikan kursus ada
     const course = await Course.findByPk(courseId);
     if (!course) {
       return res.status(404).json({ error: 'Kursus tidak ditemukan' });
@@ -149,7 +189,7 @@ app.post('/:courseId/modules', checkRole(['instructor', 'admin']), async (req, r
 });
 
 // ====================================================
-// == FITUR BARU 2: MEMBUAT MATERI BARU (INSTRUKTUR) ==
+// == FITUR MEMBUAT MATERI BARU (INSTRUKTUR) ==
 // ====================================================
 app.post('/modules/:moduleId/lessons', checkRole(['instructor', 'admin']), async (req, res) => {
   try {
@@ -160,7 +200,6 @@ app.post('/modules/:moduleId/lessons', checkRole(['instructor', 'admin']), async
       return res.status(400).json({ error: 'Title, content_type, dan lesson_order diperlukan' });
     }
 
-    // Pastikan modul ada
     const module = await Module.findByPk(moduleId);
     if (!module) {
       return res.status(404).json({ error: 'Modul tidak ditemukan' });

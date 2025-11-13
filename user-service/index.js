@@ -145,6 +145,56 @@ userRouter.get('/:id', async (req, res) => {
   }
 });
 
+// PUT /:id - Update data user
+userRouter.put('/:id', async (req, res) => {
+  try {
+    const requesterId = req.headers['x-user-id'];
+    const requesterRole = req.headers['x-user-role'];
+    const requestedId = req.params.id;
+
+    // Hanya admin atau user itu sendiri yang boleh update
+    if (requesterRole !== 'admin' && requesterId !== requestedId) {
+      return res.status(403).json({ error: 'Akses ditolak. Anda tidak punya izin.' });
+    }
+
+    const user = await User.findByPk(requestedId);
+    if (!user) {
+      return res.status(404).json({ error: 'User tidak ditemukan' });
+    }
+
+    // Ambil data yang boleh di-update dari body
+    const { username, email } = req.body;
+    
+    // Validasi sederhana (bisa Anda kembangkan)
+    if (!username && !email) {
+      return res.status(400).json({ error: 'Username atau email diperlukan untuk update' });
+    }
+
+    // Lakukan update
+    const updatedUser = await user.update({
+      username: username || user.username, // Gunakan nilai baru atau nilai lama jika tidak disediakan
+      email: email || user.email
+    });
+
+    res.json({
+      message: 'User berhasil diupdate',
+      user: {
+        id: updatedUser.id,
+        username: updatedUser.username,
+        email: updatedUser.email
+      }
+    });
+  } catch (error) {
+     if (error.name === 'SequelizeUniqueConstraintError') {
+      return res.status(400).json({ error: 'Username atau email sudah digunakan' });
+    }
+    res.status(500).json({ error: 'Internal server error', details: error.message });
+  }
+});
+
+// Pastikan ini ada di bagian bawah file
+// app.use('/', userRouter); // Anda sudah punya ini
+
 app.use('/', userRouter);
 
 app.get('/health', (req, res) => {

@@ -5,153 +5,149 @@ const API_URL = 'http://localhost:3000/api';
 const token = localStorage.getItem('token');
 const user = JSON.parse(localStorage.getItem('user'));
 
+// Elemen UI
 const courseListEl = document.getElementById('courseList');
 const myEnrollmentListEl = document.getElementById('myEnrollmentList');
 const userInfoEl = document.getElementById('userInfo');
 const messageEl = document.getElementById('message');
 
-// --- 1. Verifikasi Login ---
-if (!token || !user) {
-    // Jika tidak ada token, paksa kembali ke login
-    window.location.href = 'login.html';
-} else {
-    // Tampilkan info user
-    userInfoEl.innerHTML = `Login sebagai: <strong>${user.email}</strong> (Role: ${user.role}) <button id="logoutBtn">Logout</button>`;
+// Fungsi untuk menampilkan pesan
+function setMessage(message, type = 'danger') {
+    if (!messageEl) return;
+    messageEl.innerHTML = `<div class="alert alert-${type}" role="alert">${message}</div>`;
     
-    // Tambahkan fungsi ke tombol logout
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = 'login.html';
-    });
+    setTimeout(() => {
+        messageEl.innerHTML = '';
+        messageEl.style.display = 'none';
+    }, 3000);
+    messageEl.style.display = 'block';
 }
 
-// --- Fungsi Helper untuk Fetch API (dengan Token) ---
+// Fungsi helper untuk fetch API (dengan Token)
 async function fetchAPI(endpoint, options = {}) {
     const defaultHeaders = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}` // Tambahkan token JWT
+        'Authorization': `Bearer ${token}`
     };
+    const config = { ...options, headers: { ...defaultHeaders, ...options.headers } };
 
-    const config = {
-        ...options,
-        headers: { ...defaultHeaders, ...options.headers }
-    };
-
+    if (!token) {
+        window.location.href = 'login.html';
+        return Promise.reject(new Error("No token found"));
+    }
+    
     const response = await fetch(`${API_URL}${endpoint}`, config);
 
     if (response.status === 401 || response.status === 403) {
-        // Jika token tidak valid (kadaluarsa/salah), paksa logout
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         window.location.href = 'login.html';
     }
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Terjadi kesalahan API');
-    }
     
-    // Cek jika response punya konten (misal DELETE tidak punya)
     const contentType = response.headers.get("content-type");
+    if (!response.ok) {
+        const errorData = (contentType && contentType.indexOf("application/json") !== -1) 
+                            ? await response.json() 
+                            : { error: `Error ${response.status}` };
+        throw new Error(errorData.error || `Terjadi kesalahan ${response.status}`);
+    }
+
     if (contentType && contentType.indexOf("application/json") !== -1) {
         return response.json();
     } else {
-        return response.text(); // Return teks jika bukan JSON
+        return response.text();
     }
 }
-
-// --- 2. Fungsi Utama ---
 
 // Mengambil dan menampilkan semua kursus
 async function loadCourses() {
+    if (!courseListEl) return;
     try {
-        const courses = await fetchAPI('/courses'); // Panggil Course Service
-        courseListEl.innerHTML = ''; // Kosongkan list
+        const courses = await fetchAPI('/courses'); 
+        courseListEl.innerHTML = ''; 
         
-        courses.forEach(course => {
-            const li = document.createElement('li');
-            
-            // ===================================
-            // == [INI PERBAIKANNYA] JUDUL MENJADI LINK ==
-            // ===================================
-            li.innerHTML = `
-                <a href="course-detail.html?id=${course.id}" style="text-decoration: none; color: #0056b3; font-weight: bold;">
-                    ${course.title} (ID: ${course.id})
-                </a>
-                <button class="enroll-btn" data-course-id="${course.id}">Daftar</button>
-            `;
-            courseListEl.appendChild(li);
-        });
-    } catch (error) {
-        courseListEl.innerHTML = `<li>Gagal memuat kursus: ${error.message}</li>`;
-    }
-}
-
-// Mengambil dan menampilkan kursus yang sudah diambil
-async function loadMyEnrollments() {
-    try {
-        const enrollments = await fetchAPI('/enrollments/my-enrollments'); // Panggil Enrollment Service
-        myEnrollmentListEl.innerHTML = ''; // Kosongkan list
-
-        if (enrollments.length === 0) {
-            myEnrollmentListEl.innerHTML = '<li>Belum mendaftar kursus apapun.</li>';
+        if (courses.length === 0) {
+            courseListEl.innerHTML = '<p class="text-muted">Belum ada kursus yang tersedia.</p>';
             return;
         }
 
-        // Kita butuh data judul kursus, jadi kita panggil /api/courses
+        courses.forEach(course => {
+            const col = document.createElement('div');
+            col.className = 'col';
+
+            // ==============================================
+            // PERUBAHAN DI SINI: ?id= menjadi #id=
+            // ==============================================
+            col.innerHTML = `
+                <a href="course-detail.html#id=${course.id}" class="card h-100 course-card text-decoration-none text-dark">
+                    <img src="${course.thumbnail_url || 'https://via.placeholder.com/300x200.png?text=Kursus'}" class="card-img-top" alt="${course.title}">
+                    <div class="card-body">
+                        <h5 class="card-title">${course.title}</h5>
+                        <p class="card-text text-muted">${(course.description || '').substring(0, 100)}...</p>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <small class="text-muted">${course.category || 'Umum'}</small>
+                    </div>
+                </a>
+            `;
+            courseListEl.appendChild(col);
+        });
+    } catch (error) {
+        courseListEl.innerHTML = `<div class="col"><div class="alert alert-danger">Gagal memuat kursus: ${error.message}</div></div>`;
+    }
+}
+
+// Mengambil dan menampilkan kursus yang sudah di-enroll
+async function loadMyEnrollments() {
+    if (!myEnrollmentListEl) return;
+    try {
+        const enrollments = await fetchAPI('/enrollments/my-enrollments'); 
+        
+        if (enrollments.length === 0) {
+            myEnrollmentListEl.innerHTML = '<li class="list-group-item text-muted">Anda belum mendaftar kursus apapun.</li>';
+            return;
+        }
+
         const allCourses = await fetchAPI('/courses');
         const courseMap = new Map(allCourses.map(course => [course.id, course.title]));
 
+        myEnrollmentListEl.innerHTML = '';
+        
         enrollments.forEach(enroll => {
             const li = document.createElement('li');
-            const courseTitle = courseMap.get(enroll.course_id) || 'Kursus Tidak Ditemukan';
+            li.className = 'list-group-item';
+            const courseTitle = courseMap.get(enroll.course_id) || `Kursus (ID: ${enroll.course_id})`;
             
-            // ===================================
-            // == [INI PERBAIKANNYA] JUDUL MENJADI LINK ==
-            // ===================================
+            // ==============================================
+            // PERUBAHAN DI SINI: ?id= menjadi #id=
+            // ==============================================
             li.innerHTML = `
-                <a href="course-detail.html?id=${enroll.course_id}" style="text-decoration: none; color: #0056b3;">
-                    <strong>${courseTitle}</strong> (Status: ${enroll.status})
+                <a href="course-detail.html#id=${enroll.course_id}" class="text-decoration-none">
+                    ${courseTitle}
+                    <span class="badge bg-secondary float-end">${enroll.status}</span>
                 </a>
             `;
             myEnrollmentListEl.appendChild(li);
         });
     } catch (error) {
-        myEnrollmentListEl.innerHTML = `<li>Gagal memuat kursus saya: ${error.message}</li>`;
+        myEnrollmentListEl.innerHTML = '<li class="list-group-item list-group-item-danger">Gagal memuat kursus Anda.</li>';
     }
 }
 
-// Mendaftarkan user ke kursus
-async function enrollCourse(courseId) {
-    try {
-        messageEl.textContent = 'Mendaftarkan...';
-        messageEl.style.color = 'blue';
-
-        // Panggil Enrollment Service (POST)
-        const result = await fetchAPI(`/enrollments/${courseId}`, { method: 'POST' });
+// --- MAIN LOGIC (Hanya berjalan jika di dashboard.html) ---
+if (userInfoEl) {
+    if (!token || !user) {
+        window.location.href = 'login.html';
+    } else {
+        userInfoEl.innerHTML = `Login sebagai: <strong>${user.email}</strong> <button id="logoutBtn" class="btn btn-sm btn-danger ms-2">Logout</button>`;
         
-        messageEl.textContent = "Berhasil mendaftar! Memuat ulang kursus saya...";
-        messageEl.style.color = 'green';
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        });
 
-        // Muat ulang data
+        loadCourses();
         loadMyEnrollments();
-    } catch (error) {
-        messageEl.textContent = `Gagal mendaftar: ${error.message}`;
-        messageEl.style.color = 'red';
     }
 }
-
-// --- 3. Event Listener untuk tombol "Daftar" ---
-courseListEl.addEventListener('click', (e) => {
-    if (e.target.classList.contains('enroll-btn')) {
-        const courseId = e.target.getAttribute('data-course-id');
-        if (confirm(`Anda yakin ingin mendaftar di kursus ID: ${courseId}?`)) {
-            enrollCourse(courseId);
-        }
-    }
-});
-
-// --- 4. Muat data saat halaman dibuka ---
-loadCourses();
-loadMyEnrollments();
