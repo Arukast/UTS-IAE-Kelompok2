@@ -43,8 +43,9 @@ const authenticateJWT = (req, res, next) => {
   }
 };
 
+//
 // --- 4. Fungsi Bantuan Proxy (untuk rute terproteksi) ---
-const createAuthProxy = (target) => {
+const createAuthProxy = (target, servicePrefix) => {
   return createProxyMiddleware({
     target,
     changeOrigin: true,
@@ -57,10 +58,19 @@ const createAuthProxy = (target) => {
       }
     },
     pathRewrite: (path, req) => {
-      // Hapus /api/serviceName
-      const pathParts = path.split('/');
-      pathParts.splice(1, 2); // Hapus 'api' dan 'serviceName'
-      return pathParts.join('/') || '/';
+      // Buat pola regex untuk /api/servicePrefix
+      // Contoh: /api/courses
+      const regex = new RegExp(`^/api/${servicePrefix}`);
+      
+      // Ganti /api/servicePrefix dengan string kosong
+      const newPath = path.replace(regex, '');
+
+      // ==========================================================
+      // == [ INI BAGIAN YANG DIPERBAIKI ] ==
+      // ==========================================================
+      // Jika newPath adalah string kosong (cth: dari /api/courses),
+      // kembalikan '/', jika tidak, kembalikan path (cth: /1 atau /my-enrollments)
+      return newPath || '/';
     }
   });
 };
@@ -80,11 +90,14 @@ app.use('/api/auth', createProxyMiddleware({
 app.use(authenticateJWT);
 
 // 5c. Rute Terproteksi - BUTUH JWT
-app.use('/api/users', createAuthProxy(services.user));
-app.use('/api/courses', createAuthProxy(services.course));
+// ==========================================================
+// == [ PANGGILAN FUNGSI INI TELAH DIPERBAIKI ] ==
+// ==========================================================
+app.use('/api/users', createAuthProxy(services.user, 'users'));
+app.use('/api/courses', createAuthProxy(services.course, 'courses'));
 
 // ==========================================================
-// == [ INI ADALAH PERBAIKANNYA ] ==
+// == [ INI ADALAH PERBAIKANNYA ] == (Blok ini sudah benar dari aslinya)
 // Kita tidak bisa pakai createAuthProxy karena pathRewrite-nya salah.
 // Kita buat proxy khusus untuk /api/modules.
 // ==========================================================
@@ -104,9 +117,12 @@ app.use('/api/modules', createProxyMiddleware({
     }
 }));
 
-app.use('/api/enrollments', createAuthProxy(services.enrollment));
-app.use('/api/progress', createAuthProxy(services.progress));
-app.use('/api/notifications', createAuthProxy(services.notification));
+// ==========================================================
+// == [ PANGGILAN FUNGSI INI TELAH DIPERBAIKI ] ==
+// ==========================================================
+app.use('/api/enrollments', createAuthProxy(services.enrollment, 'enrollments'));
+app.use('/api/progress', createAuthProxy(services.progress, 'progress'));
+app.use('/api/notifications', createAuthProxy(services.notification, 'notifications'));
 
 // --- 6. Rute Lain (Health Check) ---
 app.get('/health', (req, res) => {
