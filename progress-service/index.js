@@ -66,7 +66,7 @@ async function getEnrollmentId(token, courseId, userId) {
     throw new Error('Gagal menghubungi Enrollment Service');
   }
 }
-
+// Digunakan di halaman course-details.html
 app.post('/lessons/complete', async (req, res) => {
   try {
     const user_id = req.headers['x-user-id'];
@@ -103,7 +103,7 @@ app.post('/lessons/complete', async (req, res) => {
     res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 });
-
+// Digunakan di halaman course-details.html
 app.get('/my-progress/:courseId', async (req, res) => {
   try {
     const user_id = req.headers['x-user-id'];

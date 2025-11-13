@@ -93,7 +93,7 @@ app.post('/', checkRole(['instructor', 'admin']), async (req, res) => {
   }
 });
 
-// GET / (Mendapatkan semua kursus) - Untuk semua peran
+// GET / (Mendapatkan semua kursus) - Untuk semua peran | Digunakan di halaman dashboard.html
 app.get('/', async (req, res) => {
   try {
     const courses = await Course.findAll({
@@ -105,7 +105,7 @@ app.get('/', async (req, res) => {
   }
 });
 
-// GET /:id (Mendapatkan detail kursus, termasuk modul dan lesson)
+// GET /:id (Mendapatkan detail kursus, termasuk modul dan lesson) | Digunakan di halaman course-detail.html
 app.get('/:id', async (req, res) => {
   try {
     const course = await Course.findByPk(req.params.id, {
@@ -160,9 +160,6 @@ app.put('/:id', checkRole(['instructor', 'admin']), async (req, res) => {
   }
 });
 
-// ===============================================
-// == FITUR MEMBUAT MODUL BARU (INSTRUKTUR) ==
-// ===============================================
 app.post('/:courseId/modules', checkRole(['instructor', 'admin']), async (req, res) => {
   try {
     const { title, module_order } = req.body;
@@ -188,9 +185,7 @@ app.post('/:courseId/modules', checkRole(['instructor', 'admin']), async (req, r
   }
 });
 
-// ====================================================
-// == FITUR MEMBUAT MATERI BARU (INSTRUKTUR) ==
-// ====================================================
+// POST /modules/:moduleId/lessons (membuat materi baru)
 app.post('/modules/:moduleId/lessons', checkRole(['instructor', 'admin']), async (req, res) => {
   try {
     const { title, content_type, content_url_or_text, lesson_order } = req.body;
