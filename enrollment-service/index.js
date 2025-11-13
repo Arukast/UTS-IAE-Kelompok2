@@ -132,7 +132,7 @@ app.post('/:courseId', async (req, res) => {
 
 /**
  * [PROVIDER]
- * GET /my-enrollments - Melihat semua kursus yang diambil user | Digunakan di halaman dashboard.html
+ * GET /my-enrollments - Melihat semua kursus yang diambil user
  */
 app.get('/my-enrollments', async (req, res) => {
   try {
