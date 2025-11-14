@@ -129,3 +129,8 @@
     font-weight: 500;
     color: var(--primary-dark);
 }
+
+#hero-long-desc,
+#course-desc {
+    white-space: pre-wrap;
+}
