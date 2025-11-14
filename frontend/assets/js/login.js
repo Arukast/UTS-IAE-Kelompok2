@@ -1,41 +1,39 @@
-// Menempatkan konstanta API di atas agar mudah diubah
-const API_URL = 'http://localhost:3000/api';
+// SOLUSI: 
+// Kita tidak lagi mendeklarasikan API_URL, token, atau user.
+// Variabel-variabel tersebut sekarang datang dari 'utils.js',
+// yang harus dimuat SEBELUM file ini di login.html.
 
-// --- PERBAIKAN BUG Kritis ---
-// Logika ini berjalan *sebelum* DOM dimuat untuk mengecek sesi.
-const token = localStorage.getItem('token');
-const userString = localStorage.getItem('user');
+// --- Logika Pengecekan Sesi (Redirect) ---
 
-if (token && userString) {
+// Variabel 'token' dan 'user' (objek) sekarang datang dari utils.js
+if (token && user) {
     try {
-        // SOLUSI: 
-        // Bug sebelumnya adalah mencoba mengakses 'data.user.role' 
-        // padahal 'data' tidak ada.
-        // Solusinya adalah membaca 'user' dari localStorage.
-        const user = JSON.parse(userString);
-        
+        // 'user' sudah di-parse di utils.js
         let destination = 'dashboard.html'; // Default untuk student
 
         if (user.role === 'instructor') {
             destination = 'instructor-dashboard.html';
         }
         
+        // Pindahkan ke halaman yang benar
         window.location.href = destination; 
 
     } catch (e) {
-        // Jika data 'user' di localStorage rusak, hapus sisa token
-        console.error("Gagal parse data user:", e);
+        // Jika data 'user' di localStorage rusak, utils.js 
+        // mungkin error saat parse. Kita amankan dengan hapus token.
+        console.error("Gagal memproses redirect otomatis:", e);
         localStorage.removeItem('token');
         localStorage.removeItem('user');
     }
 }
 
-// --- Logika Login Form ---
-// Menunggu DOM siap sebelum menambahkan event listener
+// --- Logika Form Login ---
+// Menunggu DOM (halaman HTML) siap
 document.addEventListener('DOMContentLoaded', () => {
+    
     const loginForm = document.getElementById('loginForm');
     
-    // Pastikan form ada sebelum menambahkan listener
+    // Pastikan form ada
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -46,8 +44,10 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Bersihkan pesan error sebelumnya
             messageDiv.textContent = '';
+            messageDiv.style.display = 'none';
 
             try {
+                // 'API_URL' sekarang datang dari utils.js
                 const response = await fetch(`${API_URL}/auth/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -57,9 +57,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
 
                 if (response.ok) {
+                    // Berhasil login, simpan data sesi
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
 
+                    // Arahkan ke dashboard yang sesuai
                     let destination = 'dashboard.html'; 
                     if (data.user.role === 'instructor') {
                         destination = 'instructor-dashboard.html';
@@ -67,11 +69,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.location.href = destination; 
 
                 } else {
+                    // Tampilkan pesan error dari server
                     messageDiv.textContent = data.error || 'Login gagal';
+                    messageDiv.style.display = 'block';
                 }
             } catch (error) {
+                // Gagal terhubung ke server
                 console.error('Error saat login:', error);
                 messageDiv.textContent = 'Tidak bisa terhubung ke server.';
+                messageDiv.style.display = 'block';
             }
         });
     }

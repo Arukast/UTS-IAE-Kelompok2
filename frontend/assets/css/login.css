@@ -1,39 +1,38 @@
-/* Gaya body sudah ada di main.css */
+body {
+    /* Pastikan body login memiliki background */
+    background: linear-gradient(to right top, #f8f9fa, #f0f4f9, #e8f0f8, #e0ecf8, #d8e8f7);
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+}
 
 .login-container { 
-    background: var(--surface-color); 
-    border: 1px solid var(--border-color); 
-    padding: 35px; /* Sedikit lebih besar */
+    background: rgba(255, 255, 255, 0.9); /* Efek Kaca */
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 2.5rem;
     border-radius: var(--border-radius-md); 
-    box-shadow: var(--shadow-medium); /* Lebih jelas untuk login */
+    box-shadow: var(--shadow-medium);
     width: 100%;
-    max-width: 400px; /* Batasi lebar */
+    max-width: 450px;
+    text-align: center;
+}
+.login-container h2 {
+    margin-bottom: 2rem;
+    color: #2c3e50;
 }
 
-input { 
-    display: block; 
-    width: 100%; /* Ubah ke 100% */
-    padding: 10px; /* Sedikit lebih tinggi */
-    margin-bottom: 15px; /* Jarak */
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-sm);
+/* Gunakan gaya form global dari main.css */
+input.form-control { 
+    text-align: left;
+    margin-bottom: 1.5rem;
 }
-
-button { 
-    padding: 12px 20px; 
-    background-color: var(--primary-color); 
-    color: white; 
-    border: none; 
-    cursor: pointer; 
-    width: 100%; /* Tombol lebar penuh */
-    border-radius: var(--border-radius-sm);
-    font-weight: 500;
-}
-button:hover {
-    background-color: var(--primary-dark);
+button.btn { 
+    width: 100%;
+    padding: 12px;
 }
 
 #message { 
-    margin-top: 15px; 
+    margin-top: 1.5rem; 
     color: red; 
 }

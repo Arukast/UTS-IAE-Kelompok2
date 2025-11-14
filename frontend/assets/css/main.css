@@ -6,59 +6,93 @@
     --font-family: 'Poppins', sans-serif;
     
     /* Palet Warna Biru Modern */
-    --primary-color: #4A90E2;      /* Biru yang lebih cerah */
-    --primary-dark: #357ABD;       /* Biru untuk hover */
-    --secondary-color: #F5A623;   /* Aksen (Oranye/Emas) */
+    --primary-color: #4A90E2;
+    --primary-dark: #357ABD;
+    --primary-light: #eaf2fb; /* Biru sangat muda */
     
     /* Warna Netral */
-    --text-color: #333333;         /* Teks gelap */
-    --text-color-light: #555555;   /* Teks abu-abu */
-    --background-color: #F9F9F9;   /* Latar belakang halaman */
-    --surface-color: #FFFFFF;      /* Warna panel/kartu */
-    --border-color: #EAEAEA;       /* Warna border */
+    --text-color: #333333;
+    --text-color-light: #5f6c7b; /* Abu-abu kebiruan */
+    
+    /* Latar Belakang Baru */
+    --background-color: #F8F9FA; /* Abu-abu sangat muda */
+    --surface-color: #FFFFFF;
+    --border-color: #EAEAEA;
 
     /* Efek Visual */
-    --border-radius-sm: 4px;
-    --border-radius-md: 8px;
-    --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.05);
-    --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --border-radius-md: 12px; /* Lebih bulat */
+    --border-radius-sm: 8px;
+    --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.08);
 }
 
-/* 3. Terapkan Gaya Global */
+/* 3. Terapkan Latar Belakang Gradien Halus */
 body {
     font-family: var(--font-family);
-    background-color: var(--background-color);
     color: var(--text-color);
     line-height: 1.6;
+    /* Latar belakang gradien halus */
+    background: linear-gradient(to right top, #f8f9fa, #f0f4f9, #e8f0f8, #e0ecf8, #d8e8f7);
+    min-height: 100vh;
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-weight: 600; /* Sedikit lebih tebal */
+    font-weight: 600;
+    color: #2c3e50; /* Biru tua untuk judul */
 }
 
-/* 4. Ubah Tampilan Komponen Bootstrap */
+/* 4. Desain Ulang Komponen Global */
 
 /* Tombol */
+.btn {
+    border-radius: var(--border-radius-sm);
+    font-weight: 500;
+    padding: 10px 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: var(--shadow-light);
+    transition: all 0.3s ease;
+}
 .btn-primary {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
-    border-radius: var(--border-radius-sm);
-    font-weight: 500;
 }
 .btn-primary:hover {
     background-color: var(--primary-dark);
     border-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+}
+.btn-outline-secondary {
+    border-color: var(--border-color);
+    color: var(--text-color-light);
+}
+.btn-outline-secondary:hover {
+    background-color: var(--primary-light);
+    color: var(--primary-dark);
+    border-color: var(--primary-light);
 }
 
-/* Panel/Kartu */
+/* Formulir */
+.form-control, .form-select {
+    border-radius: var(--border-radius-sm);
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    background-color: #fcfdff;
+    box-shadow: none;
+    font-weight: 500;
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--primary-light);
+    background-color: #fff;
+}
+
+/* Panel/Kartu Global (digunakan di form) */
 .panel {
     background: var(--surface-color);
     border-radius: var(--border-radius-md);
-    box-shadow: var(--shadow-light);
-    border: 1px solid var(--border-color);
-}
-
-/* Header/Navigasi (Tetap gelap untuk kontras) */
-.navbar-dark.bg-dark {
-    background-color: #222 !important; /* Lebih gelap dari default */
+    box-shadow: var(--shadow-medium);
+    border: none; /* Hapus border */
+    padding: 2.5rem; /* Padding lebih besar */
 }

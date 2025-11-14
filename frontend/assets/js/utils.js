@@ -49,8 +49,8 @@ async function fetchAPI(endpoint, options = {}) {
     
     const response = await fetch(`${API_URL}${endpoint}`, config);
 
-    // Otomatis logout jika token tidak valid
-    if (response.status === 401 || response.status === 403) {
+    // Otomatis logout HANYA JIKA token tidak valid (401)
+    if (response.status === 401) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         window.location.href = 'login.html';

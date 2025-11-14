@@ -4,25 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - EduConnect</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
     <link rel="stylesheet" href="assets/css/main.css">
     <link rel="stylesheet" href="assets/css/login.css">
 </head>
 <body>
 
     <main class="login-container">
-        <h2>Login EduConnect</h2>
+        
+        <h2 class="mb-4">
+            <i class="bi bi-book-half" style="color: var(--primary-color);"></i>
+            EduConnect
+        </h2>
+        
         <form id="loginForm">
-            <label for="email">Email:</label>
-            <input type="email" id="email" placeholder="contoh: student@example.com" required>
+            <div class="mb-3">
+                <label for="email" class="form-label visually-hidden">Email:</label>
+                <input type="email" id="email" class="form-control" placeholder="Masukkan email Anda" required>
+            </div>
             
-            <label for="password">Password:</label>
-            <input type="password" id="password" placeholder="Masukkan password" required>
+            <div class="mb-3">
+                <label for="password" class="form-label visually-hidden">Password:</label>
+                <input type="password" id="password" class="form-control" placeholder="Masukkan password" required>
+            </div>
             
-            <button type="submit">Login</button>
+            <button type="submit" class="btn btn-primary w-100 mt-3">
+                Login
+            </button>
         </form>
-        <div id="message"></div>
+        
+        <div id="message" class="mt-3"></div>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/utils.js"></script>
     <script src="assets/js/login.js"></script>
 </body>
 </html>

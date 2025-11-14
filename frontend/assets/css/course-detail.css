@@ -1,37 +1,131 @@
-/* Tampilan untuk hero section */
-.hero-section {
-    background-size: cover;
-    background-position: center center;
-    padding: 100px 0;
-    color: white;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-    border-radius: var(--border-radius-md); /* Terapkan radius */
-    margin-top: 1.5rem; /* Beri jarak dari nav */
-}
-.hero-section .container {
-    background-color: rgba(0, 0, 0, 0.6);
-    padding: 30px;
-    border-radius: var(--border-radius-md);
+/* Layout Dashboard Baru */
+.dashboard-layout {
+    display: flex;
+    min-height: 100vh;
 }
 
-/* Perhalus tampilan Akordion */
-.accordion-item {
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-md) !important; /* Paksa radius */
+.sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    background-color: var(--surface-color);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-medium);
+    z-index: 10;
+    overflow-y: auto;
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: 2.5rem;
+    overflow-y: auto;
+}
+
+.sidebar-brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
     margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+.sidebar-brand i {
+    font-size: 1.8rem;
+    margin-right: 10px;
+}
+.sidebar-brand span {
+    font-size: 0.8rem;
+    color: var(--text-color-light);
+    margin-left: 8px;
+    font-weight: 500;
+}
+
+.sidebar-user {
+    background-color: var(--primary-light);
+    border-radius: var(--border-radius-sm);
+    padding: 1rem;
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.sidebar-nav h6,
+.sidebar-enrollments h6 {
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    color: var(--text-color-light);
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+    padding-left: 0;
+}
+.sidebar-nav ul li a {
+    display: block;
+    padding: 12px 15px;
+    text-decoration: none;
+    color: var(--text-color-light);
+    font-weight: 500;
+    border-radius: var(--border-radius-sm);
+    margin-bottom: 5px;
+}
+.sidebar-nav ul li a i {
+    margin-right: 12px;
+    width: 20px;
+    text-align: center;
+}
+.sidebar-nav ul li a:hover {
+    background-color: var(--primary-light);
+    color: var(--primary-dark);
+}
+.sidebar-nav ul li a.active {
+    background-color: var(--primary-color);
+    color: #fff;
     box-shadow: var(--shadow-light);
 }
-.accordion-button {
-    border-radius: var(--border-radius-md) !important;
-    font-weight: 500;
+
+.sidebar-enrollments .list-group-item {
+    font-size: 0.9rem;
+    padding: 10px 0;
+}
+
+/* Desain Ulang Kartu Kursus */
+.course-card {
+    border-radius: var(--border-radius-md);
+    border: none; /* Hapus border */
+    background-color: var(--surface-color);
+    box-shadow: var(--shadow-light);
+    transition: all 0.3s ease;
+    overflow: hidden; /* Pastikan gambar mematuhi radius */
+}
+.course-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-medium);
+}
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+.card-body {
+    padding: 1.5rem;
+}
+.card-title {
     color: var(--text-color);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
 }
-.accordion-button:not(.collapsed) {
-    background-color: #f0f6ff; /* Warna biru muda saat terbuka */
-    color: var(--primary-color);
-    box-shadow: none;
+.card-text {
+    color: var(--text-color-light);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
 }
-.accordion-button:focus {
-    box-shadow: none;
-    border: none;
+.card-footer {
+    background-color: #fafbff;
+    border-top: 1px solid var(--border-color);
+    padding: 1rem 1.5rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--primary-dark);
 }

@@ -3,73 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detail Kursus</title>
+    <title>Detail Kursus - EduConnect</title>
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
     <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
     <link rel="stylesheet" href="assets/css/course-detail.css">
 </head>
-<body class="bg-light">
+<body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="dashboard.html" id="nav-brand-link">EduConnect</a>
-            <div class="d-flex text-white" id="userInfo">Loading...</div>
-        </div>
-    </nav>
-    
-    <div id="message" class="container mt-3"></div>
+    <div class="dashboard-layout">
+        
+        <aside class="sidebar">
+            <a href="dashboard.html" id="nav-brand-link" class="sidebar-brand text-decoration-none">
+                <i class="bi bi-book-half"></i> EduConnect
+            </a>
 
-    <div id="enrollment-view" style="display: none;">
-        <div class="hero-section" id="hero-bg">
-            <div class="container">
-                <h1 id="hero-title">Memuat...</h1>
-                <p id="hero-desc" class="lead"></p>
-                
-                <button id="enroll-button" class="btn btn-primary btn-lg">Daftar Kursus Ini</button>
+            <div class="sidebar-user" id="userInfo">
+                </div>
+
+            <hr>
+
+            <div class="sidebar-enrollments">
+                <h6>Navigasi</h6>
+                <p class="text-muted small">
+                    Anda sedang melihat detail kursus.
+                </p>
+            </div>
+        </aside>
+
+        <main class="main-content">
             
-            </div>
-        </div>
-        <div class="container mt-4">
-            <h3>Tentang Kursus Ini</h3>
-            <p id="hero-long-desc"></p>
-        </div>
-    </div>
+            <div id="message" style="display: none;"></div>
 
-    <div id="lesson-view" style="display: none;">
-        <div class="container-fluid bg-white p-5 mb-4 shadow-sm">
-            <div class="container">
-                <a href="dashboard.html" class="btn btn-outline-secondary mb-3" id="back-to-dashboard-link">&larr; Kembali ke Dashboard</a>
-                <a href="#" id="edit-course-link" class="btn btn-outline-info mb-3" style="display: none;">
-                    Edit Kursus
-                </a>
-                <h1 id="course-title">Memuat...</h1>
-                <p id="course-desc" class="lead text-muted"></p>
-            </div>
-        </div>
+            <div id="enrollment-view" style="display: none;">
+                
+                <div class="hero-section">
+                    <div id="hero-bg" class="hero-background"></div>
+                    <div class="hero-content">
+                        <h1 id="hero-title">Memuat...</h1>
+                        <p id="hero-desc" class="lead"></p>
+                        
+                        <button id="enroll-button" class="btn btn-primary btn-lg">
+                            <i class="bi bi-check-circle-fill me-2"></i> Daftar Kursus Ini
+                        </button>
+                    </div>
+                </div>
 
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h2>Materi Kursus</h2>
-                        <a href="#" id="create-module-link" class="btn btn-primary" style="display: none;">+ Tambah Modul</a>
+                <div class="panel mt-4">
+                    <h3 class="mb-3">
+                        <i class="bi bi-info-circle-fill text-primary me-2"></i> Tentang Kursus Ini
+                    </h3>
+                    <p id="hero-long-desc" class="course-long-description"></p>
+                </div>
+
+            </div>
+
+            <div id="lesson-view" style="display: none;">
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <a href="dashboard.html" class="btn btn-outline-secondary" id="back-to-dashboard-link">
+                            <i class="bi bi-arrow-left-circle me-2"></i> Kembali ke Dashboard
+                        </a>
+                        <a href="#" id="edit-course-link" class="btn btn-outline-info ms-2" style="display: none;">
+                            <i class="bi bi-pencil-square me-2"></i> Edit Kursus
+                        </a>
+                    </div>
+                    <div>
+                        <a href="#" id="create-module-link" class="btn btn-primary" style="display: none;">
+                            <i class="bi bi-plus-circle-fill me-2"></i> Tambah Modul
+                        </a>
+                    </div>
+                </div>
+
+                <div class="panel mb-4">
+                    <h1 id="course-title" class="mb-2">Memuat...</h1>
+                    <p id="course-desc" class="lead text-muted"></p>
+                </div>
+                
+                <div class="row g-4">
+                    <div class="col-lg-8">
+                        <h3 class="mb-3"><i class="bi bi-list-task me-2"></i> Materi Kursus</h3>
+                        <div class="accordion" id="modules-container">
+                            </div>
                     </div>
 
-                    <div class="accordion" id="modules-container">
+                    <div class="col-lg-4">
+                        <h3 class="mb-3"><i class="bi bi-bar-chart-line-fill me-2"></i> Progres Anda</h3>
+                        <div class="panel">
+                            <div id="progress-info">Memuat progres...</div>
                         </div>
-                </div>
-                <div class="col-lg-4">
-                    <h4>Progres Anda</h4>
-                    <div id="progress-info">Memuat progres...</div>
+                    </div>
                 </div>
             </div>
-        </div>
+            
+        </main>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
     <script src="assets/js/utils.js"></script>
     <script src="assets/js/course-detail.js"></script>
-
 </body>
 </html>
