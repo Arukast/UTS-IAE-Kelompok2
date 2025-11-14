@@ -9,13 +9,20 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// --- 1. Middleware Global ---
+// --- 1. Middleware Global (Dijalankan untuk semua request) ---
+
+// Optimisasi: Konfigurasi CORS dari environment variable
 const corsOptions = {
-  origin: 'http://localhost:5000' // Izinkan frontend
+  origin: process.env.CORS_ORIGIN || 'http://localhost:5000'
 };
 app.use(cors(corsOptions));
-// HAPUS app.use(express.json()); // Penting agar proxy tidak "memakan" body
-app.use(morgan('dev')); // Logger
+
+// Optimisasi (Performa): Gunakan logger yang sesuai
+if (process.env.NODE_ENV === 'production') {
+  app.use(morgan('combined')); // Logger standar untuk produksi
+} else {
+  app.use(morgan('dev')); // Logger 'dev' untuk development
+}
 
 // --- 2. Daftar URL Service ---
 const services = {
@@ -26,7 +33,29 @@ const services = {
   notification: process.env.NOTIFICATION_SERVICE_URL,
 };
 
-// --- 3. Middleware Autentikasi ---
+// --- 3. Rute Publik & Health Check (TIDAK PERLU JWT) ---
+
+// PERBAIKAN (Kritis): Health check harus publik dan diletakkan SEBELUM auth
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    services: Object.keys(services)
+  });
+});
+
+// Rute Publik (Login/Register)
+app.use('/api/auth', createProxyMiddleware({
+    target: services.user,
+    changeOrigin: true,
+    pathRewrite: {
+      '^/api/auth': '/auth' // /api/auth/login -> /auth/login
+    }
+}));
+
+// --- 4. Middleware Autentikasi (Gerbang Keamanan) ---
+
+// OPTIMISASI (Performa): Diubah menjadi Asinkron
 const authenticateJWT = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
@@ -34,17 +63,22 @@ const authenticateJWT = (req, res, next) => {
   }
 
   const token = authHeader.split(' ')[1]; // Format: Bearer TOKEN
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
+
+  // Gunakan callback asinkron (non-blocking)
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (err) {
+      // err.name bisa 'TokenExpiredError' atau 'JsonWebTokenError'
+      return res.status(403).json({ error: 'Invalid or expired token.', details: err.message });
+    }
     req.user = decoded; // Menyimpan data user dari token ke request
     next();
-  } catch (error) {
-    return res.status(403).json({ error: 'Invalid or expired token.' });
-  }
+  });
 };
 
-//
-// --- 4. Fungsi Bantuan Proxy (untuk rute terproteksi) ---
+// Terapkan JWT untuk SEMUA RUTE DI BAWAH INI
+app.use(authenticateJWT);
+
+// --- 5. Fungsi Bantuan Proxy (untuk rute terproteksi) ---
 const createAuthProxy = (target, servicePrefix) => {
   return createProxyMiddleware({
     target,
@@ -58,16 +92,9 @@ const createAuthProxy = (target, servicePrefix) => {
       }
     },
     pathRewrite: (path, req) => {
-      // Buat pola regex untuk /api/servicePrefix
-      // Contoh: /api/courses
       const regex = new RegExp(`^/api/${servicePrefix}`);
-      
-      // Ganti /api/servicePrefix dengan string kosong
       const newPath = path.replace(regex, '');
-
-      // ==========================================================
-      // == [ INI BAGIAN YANG DIPERBAIKI ] ==
-      // ==========================================================
+      
       // Jika newPath adalah string kosong (cth: dari /api/courses),
       // kembalikan '/', jika tidak, kembalikan path (cth: /1 atau /my-enrollments)
       return newPath || '/';
@@ -75,37 +102,16 @@ const createAuthProxy = (target, servicePrefix) => {
   });
 };
 
-// --- 5. Definisi Rute Proxy ---
+// --- 6. Definisi Rute Proxy Terproteksi (BUTUH JWT) ---
 
-// 5a. Rute Publik (Login/Register) - TIDAK PERLU JWT
-app.use('/api/auth', createProxyMiddleware({
-    target: services.user,
-    changeOrigin: true,
-    pathRewrite: {
-      '^/api/auth': '/auth' // /api/auth/login -> /auth/login
-    }
-}));
-
-// 5b. Terapkan JWT untuk SEMUA RUTE DI BAWAH INI
-app.use(authenticateJWT);
-
-// 5c. Rute Terproteksi - BUTUH JWT
-// ==========================================================
-// == [ PANGGILAN FUNGSI INI TELAH DIPERBAIKI ] ==
-// ==========================================================
 app.use('/api/users', createAuthProxy(services.user, 'users'));
 app.use('/api/courses', createAuthProxy(services.course, 'courses'));
 
-// ==========================================================
-// == [ INI ADALAH PERBAIKANNYA ] == (Blok ini sudah benar dari aslinya)
-// Kita tidak bisa pakai createAuthProxy karena pathRewrite-nya salah.
-// Kita buat proxy khusus untuk /api/modules.
-// ==========================================================
+// Proxy khusus untuk /api/modules
 app.use('/api/modules', createProxyMiddleware({
     target: services.course,
     changeOrigin: true,
     onProxyReq: (proxyReq, req, res) => {
-      // Tetap teruskan info user
       if (req.user) {
         proxyReq.setHeader('X-User-Id', req.user.id);
         proxyReq.setHeader('X-User-Role', req.user.role);
@@ -113,27 +119,25 @@ app.use('/api/modules', createProxyMiddleware({
       }
     },
     pathRewrite: {
-      '^/api': '' // Penulisan ulang yang benar: /api/modules/2 -> /modules/2
+      '^/api': '' // /api/modules/2 -> /modules/2
     }
 }));
 
-// ==========================================================
-// == [ PANGGILAN FUNGSI INI TELAH DIPERBAIKI ] ==
-// ==========================================================
 app.use('/api/enrollments', createAuthProxy(services.enrollment, 'enrollments'));
 app.use('/api/progress', createAuthProxy(services.progress, 'progress'));
 app.use('/api/notifications', createAuthProxy(services.notification, 'notifications'));
 
-// --- 6. Rute Lain (Health Check) ---
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    services: Object.keys(services)
-  });
+// --- 7. Penanganan Error & 404 (Diletakkan di paling bawah) ---
+
+// Optimisasi (Kerapian): Menangani rute 404
+app.use((req, res, next) => {
+  res.status(404).json({ error: 'Endpoint Not Found', path: req.originalUrl });
 });
 
-// --- 7. Jalankan Server ---
+// --- 8. Jalankan Server ---
 app.listen(PORT, () => {
-  console.log(`API Gateway with JWT (FIXED) running on port ${PORT}`);
+  console.log(`API Gateway (Optimized) running on port ${PORT}`);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`CORS_ORIGIN diizinkan: ${corsOptions.origin}`);
+  }
 });
