@@ -5,9 +5,33 @@
     padding: 100px 0;
     color: white;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    border-radius: var(--border-radius-md); /* Terapkan radius */
+    margin-top: 1.5rem; /* Beri jarak dari nav */
 }
 .hero-section .container {
     background-color: rgba(0, 0, 0, 0.6);
     padding: 30px;
-    border-radius: 8px;
+    border-radius: var(--border-radius-md);
+}
+
+/* Perhalus tampilan Akordion */
+.accordion-item {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md) !important; /* Paksa radius */
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-light);
+}
+.accordion-button {
+    border-radius: var(--border-radius-md) !important;
+    font-weight: 500;
+    color: var(--text-color);
+}
+.accordion-button:not(.collapsed) {
+    background-color: #f0f6ff; /* Warna biru muda saat terbuka */
+    color: var(--primary-color);
+    box-shadow: none;
+}
+.accordion-button:focus {
+    box-shadow: none;
+    border: none;
 }

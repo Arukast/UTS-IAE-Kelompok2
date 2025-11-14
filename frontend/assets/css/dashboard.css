@@ -1,15 +1,23 @@
-body { 
-    background-color: #f8f9fa; 
-}
-.panel { 
-    background: #fff; 
-    border-radius: 8px; 
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
-}
+/* body dan panel sudah ada di main.css */
+
 .course-card {
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-light);
     transition: all 0.2s ease-in-out;
 }
 .course-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow-medium); /* Bayangan lebih jelas saat hover */
+}
+.card-title {
+    color: var(--primary-color);
+}
+.card-img-top {
+    border-top-left-radius: var(--border-radius-md);
+    border-top-right-radius: var(--border-radius-md);
+}
+.card-footer {
+    background-color: transparent;
+    border-top: 1px solid var(--border-color);
 }

@@ -1,0 +1,64 @@
+/* 1. Impor Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+/* 2. Definisikan Variabel Desain (Palet Warna) */
+:root {
+    --font-family: 'Poppins', sans-serif;
+    
+    /* Palet Warna Biru Modern */
+    --primary-color: #4A90E2;      /* Biru yang lebih cerah */
+    --primary-dark: #357ABD;       /* Biru untuk hover */
+    --secondary-color: #F5A623;   /* Aksen (Oranye/Emas) */
+    
+    /* Warna Netral */
+    --text-color: #333333;         /* Teks gelap */
+    --text-color-light: #555555;   /* Teks abu-abu */
+    --background-color: #F9F9F9;   /* Latar belakang halaman */
+    --surface-color: #FFFFFF;      /* Warna panel/kartu */
+    --border-color: #EAEAEA;       /* Warna border */
+
+    /* Efek Visual */
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.05);
+    --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* 3. Terapkan Gaya Global */
+body {
+    font-family: var(--font-family);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600; /* Sedikit lebih tebal */
+}
+
+/* 4. Ubah Tampilan Komponen Bootstrap */
+
+/* Tombol */
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    border-radius: var(--border-radius-sm);
+    font-weight: 500;
+}
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+}
+
+/* Panel/Kartu */
+.panel {
+    background: var(--surface-color);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-light);
+    border: 1px solid var(--border-color);
+}
+
+/* Header/Navigasi (Tetap gelap untuk kontras) */
+.navbar-dark.bg-dark {
+    background-color: #222 !important; /* Lebih gelap dari default */
+}

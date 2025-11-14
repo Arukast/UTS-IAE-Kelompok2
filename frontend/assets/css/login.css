@@ -1,39 +1,36 @@
-/* SOLUSI: 
-  CSS dipindahkan ke file terpisah untuk "Separation of Concerns".
-*/
-body { 
-    font-family: sans-serif; 
-    display: grid; 
-    place-items: center; 
-    min-height: 90vh; 
-    background-color: #f4f4f4; 
-}
+/* Gaya body sudah ada di main.css */
 
-/* SOLUSI: 
-  Menggunakan class selector (.login-container) alih-alih 
-  tag selector (div) agar tidak mengganggu elemen <div> lain.
-*/
 .login-container { 
-    background: #fff; 
-    border: 1px solid #ccc; 
-    padding: 25px; 
-    border-radius: 8px; 
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+    background: var(--surface-color); 
+    border: 1px solid var(--border-color); 
+    padding: 35px; /* Sedikit lebih besar */
+    border-radius: var(--border-radius-md); 
+    box-shadow: var(--shadow-medium); /* Lebih jelas untuk login */
+    width: 100%;
+    max-width: 400px; /* Batasi lebar */
 }
 
 input { 
     display: block; 
-    width: 300px; 
-    padding: 8px; 
-    margin-bottom: 10px; 
+    width: 100%; /* Ubah ke 100% */
+    padding: 10px; /* Sedikit lebih tinggi */
+    margin-bottom: 15px; /* Jarak */
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
 }
 
 button { 
-    padding: 10px 15px; 
-    background-color: #007bff; 
+    padding: 12px 20px; 
+    background-color: var(--primary-color); 
     color: white; 
     border: none; 
     cursor: pointer; 
+    width: 100%; /* Tombol lebar penuh */
+    border-radius: var(--border-radius-sm);
+    font-weight: 500;
+}
+button:hover {
+    background-color: var(--primary-dark);
 }
 
 #message { 
