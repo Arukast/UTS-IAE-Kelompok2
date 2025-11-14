@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Kursus</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .panel { background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body>
+    
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="instructor-dashboard.html">EduConnect (Instructor)</a>
+            <div class="d-flex text-white" id="userInfo">Loading...</div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                
+                <a href="#" id="back-link" class="btn btn-outline-secondary mb-3">&larr; Kembali ke Detail Kursus</a>
+
+                <div class="panel p-4 p-md-5">
+                    <h2 class="mb-4">Edit Kursus</h2>
+                    
+                    <div id="message" class="mb-3"></div>
+
+                    <form id="edit-course-form">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Judul Kursus</label>
+                            <input type="text" class="form-control" id="title" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Deskripsi Lengkap</label>
+                            <textarea class="form-control" id="description" rows="6" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="thumbnail_url" class="form-label">URL Gambar Thumbnail</label>
+                            <input type="url" class="form-control" id="thumbnail_url" placeholder="https://via.placeholder.com/300x200.png?text=Kursus">
+                            <div class="form-text">Opsional.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Kategori</label>
+                            <input type="text" class="form-control" id="category" placeholder="Contoh: Pemrograman, Bisnis, Desain">
+                            <div class="form-text">Opsional.</div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <button type="submit" id="submit-button" class="btn btn-primary btn-lg">
+                            Simpan Perubahan
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+<script>
+// ==========================================================
+// == SELURUH LOGIKA SCRIPT BERBEDA DARI 'CREATE' ==
+// ==========================================================
+const API_URL = 'http://localhost:3000/api';
+const token = localStorage.getItem('token');
+const user = JSON.parse(localStorage.getItem('user'));
+const messageEl = document.getElementById('message');
+
+// 1. Ambil ID Kursus dari URL Hash
+const hash = window.location.hash.substring(1);
+const urlParams = new URLSearchParams(hash);
+const courseId = urlParams.get('id');
+
+// 2. Verifikasi Login & courseId
+if (!token || !user) {
+    window.location.href = 'login.html';
+} else if (!courseId) {
+    alert('ID Kursus tidak ditemukan!');
+    window.location.href = 'instructor-dashboard.html';
+} else {
+    // Setup Info User
+    const userInfoEl = document.getElementById('userInfo');
+    userInfoEl.innerHTML = `Login sebagai: <strong>${user.email}</strong> <button id="logoutBtn" class="btn btn-sm btn-danger ms-2">Logout</button>`;
+    
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = 'login.html';
+    });
+
+    // Setup link "Kembali"
+    document.getElementById('back-link').href = `course-detail.html#id=${courseId}`;
+
+    // Muat data kursus yang ada
+    loadCourseData();
+}
+
+// 3. Fungsi Fetch API (Sama)
+async function fetchAPI(endpoint, options = {}) {
+    const defaultHeaders = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+    };
+    const config = { ...options, headers: { ...defaultHeaders, ...options.headers } };
+    const response = await fetch(`${API_URL}${endpoint}`, config);
+
+    if (response.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = 'login.html';
+    }
+    
+    const contentType = response.headers.get("content-type");
+    if (!response.ok) {
+        const errorData = (contentType && contentType.indexOf("application/json") !== -1) ? await response.json() : { error: `Error ${response.status}` };
+        throw new Error(errorData.error || `Terjadi kesalahan ${response.status}`);
+    }
+
+    if (contentType && contentType.indexOf("application/json") !== -1) {
+        return response.json();
+    } else {
+        return response.text();
+    }
+}
+
+// 4. Fungsi Set Message (Sama)
+function setMessage(message, type = 'danger') {
+    if (!message) {
+        messageEl.innerHTML = '';
+    } else {
+        messageEl.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+    }
+}
+
+// 5. BARU: Fungsi untuk memuat data kursus ke formulir
+const titleEl = document.getElementById('title');
+const descriptionEl = document.getElementById('description');
+const thumbnailEl = document.getElementById('thumbnail_url');
+const categoryEl = document.getElementById('category');
+
+async function loadCourseData() {
+    try {
+        setMessage('Memuat data kursus...', 'info');
+        const course = await fetchAPI(`/courses/${courseId}`);
+        
+        titleEl.value = course.title;
+        descriptionEl.value = course.description;
+        thumbnailEl.value = course.thumbnail_url;
+        categoryEl.value = course.category;
+        
+        setMessage(''); // Hapus pesan 'Memuat...'
+    } catch (error) {
+        setMessage(`Gagal memuat data: ${error.message}`, 'danger');
+    }
+}
+
+// 6. MODIFIKASI: Logika untuk Submit Form (Update)
+const form = document.getElementById('edit-course-form');
+const submitButton = document.getElementById('submit-button');
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault(); 
+    
+    submitButton.disabled = true;
+    submitButton.textContent = 'Menyimpan...';
+    setMessage(''); 
+
+    // Ambil data dari form
+    const payload = {
+        title: titleEl.value,
+        description: descriptionEl.value,
+        thumbnail_url: thumbnailEl.value ? thumbnailEl.value : null,
+        category: categoryEl.value ? categoryEl.value : null,
+        instructor_id: user.id // Diperlukan untuk validasi/konsistensi
+    };
+    
+    try {
+        // Kirim sebagai PUT ke endpoint spesifik
+        await fetchAPI(`/courses/${courseId}`, {
+            method: 'PUT', // METODE BERUBAH
+            body: JSON.stringify(payload)
+        });
+
+        setMessage('Kursus berhasil diperbarui! Mengalihkan kembali...', 'success');
+        
+        // Arahkan kembali ke halaman detail setelah 2 detik
+        setTimeout(() => {
+            window.location.href = `course-detail.html#id=${courseId}`;
+        }, 2000);
+
+    } catch (error) {
+        setMessage(`Gagal memperbarui kursus: ${error.message}`, 'danger');
+        submitButton.disabled = false;
+        submitButton.textContent = 'Simpan Perubahan';
+    }
+});
+</script>
+
+</body>
+</html>

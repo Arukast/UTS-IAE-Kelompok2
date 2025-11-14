@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buat Materi Baru</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .panel { background: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body>
+    
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="instructor-dashboard.html">EduConnect (Instructor)</a>
+            <div class="d-flex text-white" id="userInfo">Loading...</div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                
+                <a href="#" id="back-link" class="btn btn-outline-secondary mb-3">&larr; Kembali ke Detail Kursus</a>
+
+                <div class="panel p-4 p-md-5">
+                    <h2 class="mb-4">Buat Materi (Lesson) Baru</h2>
+                    
+                    <div id="message" class="mb-3"></div>
+
+                    <form id="create-lesson-form">
+                        
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Judul Materi</label>
+                            <input type="text" class="form-control" id="title" required>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="content_type" class="form-label">Tipe Konten</label>
+                                <select class="form-select" id="content_type" required>
+                                    <option value="video">Video</option>
+                                    <option value="text">Teks</option>
+                                    <option value="quiz">Kuis</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="lesson_order" class="form-label">Nomor Urut Materi</label>
+                                <input type="number" class="form-control" id="lesson_order" required min="1">
+                                <div class="form-text">Contoh: 1, 2, 3...</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="content_url_or_text" class="form-label" id="content-label">URL Video</label>
+                            <textarea class="form-control" id="content_url_or_text" rows="5" placeholder="https://www.youtube.com/watch?v=..."></textarea>
+                            <div class="form-text">Masukkan URL (untuk Video/Kuis) atau isi materi (untuk Teks).</div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <button type="submit" id="submit-button" class="btn btn-primary btn-lg">
+                            Buat Materi
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+<script>
+const API_URL = 'http://localhost:3000/api';
+const token = localStorage.getItem('token');
+const user = JSON.parse(localStorage.getItem('user'));
+const messageEl = document.getElementById('message');
+
+// 1. Ambil ID Kursus & Modul dari URL Hash
+const hash = window.location.hash.substring(1);
+const urlParams = new URLSearchParams(hash);
+const courseId = urlParams.get('courseId');
+const moduleId = urlParams.get('moduleId');
+
+// 2. Verifikasi Login & ID
+if (!token || !user) {
+    window.location.href = 'login.html';
+} else if (!courseId || !moduleId) {
+    alert('ID Kursus atau ID Modul tidak ditemukan!');
+    window.location.href = 'instructor-dashboard.html';
+} else {
+    // Setup Info User
+    const userInfoEl = document.getElementById('userInfo');
+    userInfoEl.innerHTML = `Login sebagai: <strong>${user.email}</strong> <button id="logoutBtn" class="btn btn-sm btn-danger ms-2">Logout</button>`;
+    
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = 'login.html';
+    });
+
+    // Setup link "Kembali" (hanya butuh courseId)
+    document.getElementById('back-link').href = `course-detail.html#id=${courseId}`;
+}
+
+// 3. Fungsi Fetch API (Sama)
+async function fetchAPI(endpoint, options = {}) {
+    // ... (fungsi fetchAPI sama) ...
+    const defaultHeaders = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+    };
+    const config = { ...options, headers: { ...defaultHeaders, ...options.headers } };
+    const response = await fetch(`${API_URL}${endpoint}`, config);
+
+    if (response.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = 'login.html';
+    }
+    
+    const contentType = response.headers.get("content-type");
+    if (!response.ok) {
+        const errorData = (contentType && contentType.indexOf("application/json") !== -1) ? await response.json() : { error: `Error ${response.status}` };
+        throw new Error(errorData.error || `Terjadi kesalahan ${response.status}`);
+    }
+
+    if (contentType && contentType.indexOf("application/json") !== -1) {
+        return response.json();
+    } else {
+        return response.text();
+    }
+}
+
+// 4. Fungsi Set Message (Sama)
+function setMessage(message, type = 'danger') {
+    if (!message) {
+        messageEl.innerHTML = '';
+    } else {
+        messageEl.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+    }
+}
+
+// 5. Elemen Form & Logika Dinamis
+const form = document.getElementById('create-lesson-form');
+const submitButton = document.getElementById('submit-button');
+
+const titleEl = document.getElementById('title');
+const contentTypeEl = document.getElementById('content_type');
+const lessonOrderEl = document.getElementById('lesson_order');
+const contentLabel = document.getElementById('content-label');
+const contentEl = document.getElementById('content_url_or_text');
+
+// Ubah label & placeholder berdasarkan Tipe Konten
+contentTypeEl.addEventListener('change', (e) => {
+    const type = e.target.value;
+    if (type === 'text') {
+        contentLabel.textContent = 'Isi Materi Teks';
+        contentEl.placeholder = 'Tuliskan materi teks Anda di sini...';
+    } else if (type === 'video') {
+        contentLabel.textContent = 'URL Video';
+        contentEl.placeholder = 'https://www.youtube.com/watch?v=...';
+    } else if (type === 'quiz') {
+        contentLabel.textContent = 'URL Kuis';
+        contentEl.placeholder = 'https://link.ke.kuis/form...';
+    }
+});
+
+// 6. Logika Submit Form
+form.addEventListener('submit', async (e) => {
+    e.preventDefault(); 
+    
+    submitButton.disabled = true;
+    submitButton.textContent = 'Membuat...';
+    setMessage(''); 
+
+    // Validasi Nomor Urut
+    const lessonOrder = parseInt(lessonOrderEl.value);
+    if (isNaN(lessonOrder) || lessonOrder <= 0) {
+        setMessage('Nomor urut materi harus angka positif yang valid.', 'danger');
+        submitButton.disabled = false;
+        submitButton.textContent = 'Buat Materi';
+        return;
+    }
+
+    // Susun payload sesuai model
+    const payload = {
+        title: titleEl.value,
+        content_type: contentTypeEl.value,
+        content_url_or_text: contentEl.value || null,
+        lesson_order: lessonOrder
+    };
+    
+    try {
+        // Panggil endpoint /modules/:moduleId/lessons
+        await fetchAPI(`/modules/${moduleId}/lessons`, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+
+        setMessage('Materi berhasil dibuat! Memuat ulang halaman detail...', 'success');
+        
+        // Arahkan kembali ke halaman detail kursus
+        setTimeout(() => {
+            window.location.href = `course-detail.html#id=${courseId}`;
+        }, 2000);
+
+    } catch (error) {
+        setMessage(`Gagal membuat materi: ${error.message}`, 'danger');
+        submitButton.disabled = false;
+        submitButton.textContent = 'Buat Materi';
+    }
+});
+</script>
+
+</body>
+</html>]

@@ -52,17 +52,23 @@
         <div class="container-fluid bg-white p-5 mb-4 shadow-sm">
             <div class="container">
                 <a href="dashboard.html" class="btn btn-outline-secondary mb-3" id="back-to-dashboard-link">&larr; Kembali ke Dashboard</a>
+                <a href="#" id="edit-course-link" class="btn btn-outline-info mb-3" style="display: none;">
+                    Edit Kursus
+                </a>
                 <h1 id="course-title">Memuat...</h1>
                 <p id="course-desc" class="lead text-muted"></p>
             </div>
         </div>
 
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="d-flex justify-content-between align-items-center mb-3">
                     <h2>Materi Kursus</h2>
-                    <div class="accordion" id="modules-container">
-                        </div>
+                    <a href="#" id="create-module-link" class="btn btn-primary" style="display: none;">+ Tambah Modul</a>
+                </div>
+
+                <div class="accordion" id="modules-container">
+                    </div>
                 </div>
                 <div class="col-lg-4">
                     <h4>Progres Anda</h4>
@@ -253,6 +259,7 @@ function showEnrollmentView(course) {
 }
 
 // --- 6. Tampilkan View 2 (Materi) ---
+// --- 6. Tampilkan View 2 (Materi) ---
 function showLessonView(course, progress) {
     const lessonView = document.getElementById('lesson-view');
     if (!lessonView) {
@@ -260,6 +267,26 @@ function showLessonView(course, progress) {
         return;
     }
 
+    // ===================================
+    // == LOGIKA TOMBOL (BAGIAN 1) ==
+    // ===================================
+    if (user.role === 'instructor') {
+        // Tampilkan tombol "Edit Kursus"
+        const editCourseLink = document.getElementById('edit-course-link');
+        if (editCourseLink) {
+            editCourseLink.href = `instructor-edit-course.html#id=${courseId}`;
+            editCourseLink.style.display = 'inline-block';
+        }
+
+        // Tampilkan tombol "Tambah Modul"
+        const createModuleLink = document.getElementById('create-module-link');
+        if (createModuleLink) {
+            createModuleLink.href = `instructor-create-module.html#id=${courseId}`;
+            createModuleLink.style.display = 'inline-block';
+        }
+    }
+    // ===================================
+    
     // Set link "Kembali"
     const dashboardUrl = (user.role === 'instructor') 
         ? 'instructor-dashboard.html' 
@@ -306,7 +333,6 @@ function showLessonView(course, progress) {
                     </button>
                 `;
                 
-                // Instruktur tidak bisa menyelesaikan materi
                 if (isInstructor) {
                     buttonHtml = `<span class="badge bg-secondary">Instructor View</span>`;
                 }
@@ -322,22 +348,43 @@ function showLessonView(course, progress) {
                 `;
             }).join('');
 
-            accordionItem.innerHTML = `
-                <h2 class="accordion-header" id="heading-${module.id}">
-                    <button class="accordion-button ${index > 0 ? 'collapsed' : ''}" type="button" data-bs-toggle="collapse" 
-                            data-bs-target="#collapse-${module.id}" aria-expanded="${index === 0 ? 'true' : 'false'}" aria-controls="collapse-${module.id}">
-                        <strong>${moduleTitle}</strong>
-                    </button>
-                </h2>
-                <div id="collapse-${module.id}" class="accordion-collapse collapse ${index === 0 ? 'show' : ''}" 
-                     aria-labelledby="heading-${module.id}" data-bs-parent="#modules-container">
-                    <div class="accordion-body p-0">
-                        <ul class="list-group list-group-flush">
-                            ${lessonsHtml.length > 0 ? lessonsHtml : '<li class="list-group-item text-muted">Belum ada materi di modul ini.</li>'}
-                        </ul>
+            // ==========================================================
+            // == [ PERBAIKAN: Logika link dipindahkan ke DALAM loop ] ==
+            // == Variabel 'module' sekarang valid di sini
+            // ==========================================================
+            let instructorLinkHtml = '';
+            if (user.role === 'instructor') {
+                // URL harus berisi courseId dan moduleId
+                const createLessonUrl = `instructor-create-lesson.html#courseId=${courseId}&moduleId=${module.id}`;
+                instructorLinkHtml = `
+                    <div class="p-3 border-top">
+                        <a href="${createLessonUrl}" class="btn btn-sm btn-outline-primary w-100">
+                            + Tambah Materi ke Modul Ini
+                        </a>
                     </div>
+                `;
+            }
+            // ==========================================================
+
+            accordionItem.innerHTML = `
+            <h2 class="accordion-header" id="heading-${module.id}">
+                <button class="accordion-button ${index > 0 ? 'collapsed' : ''}" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#collapse-${module.id}" aria-expanded="${index === 0 ? 'true' : 'false'}" aria-controls="collapse-${module.id}">
+                    <strong>${moduleTitle}</strong>
+                </button>
+            </h2>
+            <div id="collapse-${module.id}" class="accordion-collapse collapse ${index === 0 ? 'show' : ''}" 
+                 aria-labelledby="heading-${module.id}" data-bs-parent="#modules-container">
+                <div class="accordion-body p-0">
+                    <ul class="list-group list-group-flush">
+                        ${lessonsHtml.length > 0 ? lessonsHtml : '<li class="list-group-item text-muted">Belum ada materi di modul ini.</li>'}
+                    </ul>
+                    
+                    ${instructorLinkHtml}
+
                 </div>
-            `;
+            </div>
+        `;
             modulesContainer.appendChild(accordionItem);
         });
     }
@@ -345,7 +392,6 @@ function showLessonView(course, progress) {
     // Bagian Logika Progress Bar
     const progressInfoEl = document.getElementById('progress-info');
     if (progressInfoEl) {
-        // Instruktur tidak punya progress bar
         if (user.role === 'instructor') {
             progressInfoEl.innerHTML = '<p class="text-muted">Progres tidak dilacak untuk instruktur.</p>';
         } else {
@@ -353,7 +399,6 @@ function showLessonView(course, progress) {
             const completedCount = completedLessonIds.size;
             const progressPercent = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
 
-            // TYPO FIX SUDAH DITERAPKAN DI SINI ('progressPercent')
             progressInfoEl.innerHTML = `
                 <p>${completedCount} dari ${totalLessons} materi selesai.</p>
                 <div class="progress">
