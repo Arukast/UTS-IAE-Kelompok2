@@ -661,7 +661,7 @@
 								}
 							],
 							"cookie": [],
-							"body": "{\n    \"thumbnail_url\": \"https://via.placeholder.com/300x200.png?text=Kursus\",\n    \"id\": 1,\n    \"title\": \"Merancang Nuklir\",\n    \"description\": \"Kursus lengkap merancang reaktor nuklir dari nol.\",\n    \"instructor_id\": \"2\",\n    \"category\": \"Sains\",\n    \"updatedAt\": \"2025-11-15T13:12:26.473Z\",\n    \"createdAt\": \"2025-11-15T13:12:26.473Z\"\n}"
+							"body": "{\n    \"thumbnail_url\": \"https://nypost.com/wp-content/uploads/sites/2/2017/05/gettyimages-1374485.jpg?quality=90&strip=all\",\n    \"id\": 1,\n    \"title\": \"Merancang Nuklir\",\n    \"description\": \"Kursus lengkap merancang reaktor nuklir dari nol.\",\n    \"instructor_id\": \"2\",\n    \"category\": \"Sains\",\n    \"updatedAt\": \"2025-11-15T13:12:26.473Z\",\n    \"createdAt\": \"2025-11-15T13:12:26.473Z\"\n}"
 						}
 					]
 				},
