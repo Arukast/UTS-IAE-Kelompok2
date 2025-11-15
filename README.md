@@ -140,12 +140,19 @@ sequenceDiagram
 
 ```
 # Cara Menjalankan
-## Urutan Start:
+## Setup Awal:
+1. Masuk ke ke salah satu folder, misal folder API-Gateway
+2. Buka terminal di VS Code atau terminal yang sedang di direktori folder yang ingin disetup
+3. Jalankan perintah `npm install` (jika tidak bisa berarti Anda belum menginstall Node.js)
+4. Jika berhasil, akan terbuat folder **node_modules** dan file **package-lock.json**
+5. Kembali ke step 1 dengan folder yang berbeda (Folder yang harus di setup: **api-gateway**, **course-service**, **enrollment-service**, **notification-service**, **progress-service**, dan **user-service**) 
+## Urutan Start: (Bisa menggunakna **start-all.bat** yang disediakan)
 1. Mulai dengan menjalankan API Gateway di Port 3000
 2. Kemudian jalankan semua microservices di port yang telah ditentukan (3001-3005)
    `npm run dev`
-   `npx run dev`
-4. Terakhir, jalankan frontend client
+2.1 Jika pada terminal service Notification tidak berjalan karena error, coba jalankan perintah berikut `npm install axios` lalu jalankan kembali dengan menggunakan perintah `npm run dev`
+5. Terakhir, jalankan frontend client
+   `npx serve -l 5000`
 
 ## Port yang Digunakan:
 1. API Gateway: Port 3000
@@ -156,10 +163,41 @@ sequenceDiagram
 6. Notification Service: Port 3005
 
 ## Variabel ENV yang Perlu Diset:
-1. DB_USER: username untuk database
-2. DB_PASS: password untuk database
-3. API_KEY: untuk autentikasi API
-4. PORT: untuk setiap layanan di atas, sesuai dengan port yang telah ditentukan
+1. API-Gateway: (Bisa langsung gunakan `.env.example` yang ada pada folder service dengan cara mengubah nama `.env.example` -> `.env`)
+   - PORT: 3000
+   - JWT_SECRET: rahasia_super_aman_ganti_ini **(atau ganti sesuai keiinginan)**
+   - CORS_ORIGIN: http://localhost:5000
+   - USER_SERVICE_URL: http://localhost:3001
+   - COURSE_SERVICE_URL: http://localhost:3002
+   - ENROLLMENT_SERVICE_URL: http://localhost:3003
+   - PROGRESS_SERVICE_URL: http://localhost:3004
+   - NOTIFICATION_SERVICE_URL: http://localhost:3005
+   - NODE_ENV: development **(Sesuaikan)**
+3. Course-Service: (Bisa langsung gunakan **.env.example** yang ada pada folder service dengan cara mengubah nama **.env.example** -> **.env**)
+   - PORT: 3002
+   - DATABASE_URL: sqlite:./course.db
+   - NODE_ENV: development
+5. Enrollment-Service: (Bisa langsung gunakan **.env.example** yang ada pada folder service dengan cara mengubah nama **.env.example** -> **.env**)
+   - PORT: 3003
+   - API_GATEWAY_URL: http://localhost:3000
+   - DATABASE_URL: sqlite:./enrollment.db
+   - NODE_ENV: development
+7. Notification-Service: (Bisa langsung gunakan **.env.example** yang ada pada folder service dengan cara mengubah nama **.env.example** -> **.env**)
+   - PORT: 3005
+   - API_GATEWAY_URL: http://localhost:3000
+   - DATABASE_URL: sqlite:./notification.db
+   - NODE_ENV: development
+9. Progress-Service: (Bisa langsung gunakan **.env.example** yang ada pada folder service dengan cara mengubah nama **.env.example** -> **.env**)
+   - PORT: 3004
+   - API_GATEWAY_URL: http://localhost:3000
+   - DATABASE_URL: sqlite:./progress.db
+   - NODE_ENV: development
+11. User-Service: (Bisa langsung gunakan **.env.example** yang ada pada folder service dengan cara mengubah nama **.env.example** -> **.env**)
+   - PORT: 3001
+   - JWT_SECRET: rahasia_super_aman_ganti_ini **(atau ganti sesuai keiinginan)**
+   - DATABASE_URL: sqlite:./user.db
+   - NODE_ENV: development
+
 
 # Anggota & Peran
 | Nama                        | Peran/Service                     |
@@ -173,28 +211,28 @@ sequenceDiagram
 ## User Service
 | Method  |         Endpoint          |         Deskripsi         |
 |---------|---------------------------|---------------------------|
-|  GET    |       `npm run nigeeeerrrrrrrrr`    |           Test            |
+|  GET    |       `npm run`    |           Test            |
 
 ---
 
 ## Course Service
 | Method  |         Endpoint          |         Deskripsi         |
 |---------|---------------------------|---------------------------|
-|  GET    |       `npm run nigeeeerrrrrrrrr`    |           Test            |
+|  GET    |       `npm run `    |           Test            |
 
 ---
 
 ## Progress Service
 | Method  |         Endpoint          |         Deskripsi         |
 |---------|---------------------------|---------------------------|
-|  GET    |       `npm run nigeeeerrrrrrrrr`    |           Test            |
+|  GET    |       `npm run`    |           Test            |
 
 ---
 
 ## Enrollment Service
 | Method  |         Endpoint          |         Deskripsi         |
 |---------|---------------------------|---------------------------|
-|  GET    |       `npm run nigeeeerrrrrrrrr`    |           Test            |
+|  GET    |       `npm run`    |           Test            |
 
 ---
 
