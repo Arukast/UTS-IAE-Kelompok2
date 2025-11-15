@@ -152,6 +152,12 @@ sequenceDiagram
 5. Jalankan frontend client `npx serve -l 5000`
 6. Buka link local yang ada di terminal frontend client yaitu: `http://localhost:5000/`
 7. Setelah membuka link local frontend, selanjutnya adalah pilih halaman **login.html** untuk autentikasi sebelum menggunakan webiste
+  - Instructor:
+    - Email: `instructor@example.com`
+    - Password: `password123` 
+  - Student:
+    - Email: `student@example.com`
+    - Password: `password123` 
 
 ## Port yang Digunakan:
 1. API Gateway: Port 3000
