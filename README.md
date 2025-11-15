@@ -162,39 +162,39 @@ sequenceDiagram
 
 ## Variabel ENV yang Perlu Diset:
 1. API-Gateway: (Bisa langsung gunakan **.env.example** yang ada pada folder service dengan cara mengubah nama **.env.example** -> **.env**)
-- PORT: 3000
-- JWT_SECRET: rahasia_super_aman_ganti_ini **(atau ganti sesuai keiinginan)**
-- CORS_ORIGIN: http://localhost:5000
-- USER_SERVICE_URL: http://localhost:3001
-- COURSE_SERVICE_URL: http://localhost:3002
-- ENROLLMENT_SERVICE_URL: http://localhost:3003
-- PROGRESS_SERVICE_URL: http://localhost:3004
-- NOTIFICATION_SERVICE_URL: http://localhost:3005
-- NODE_ENV: development **(Sesuaikan)**
-3. Course-Service: (Bisa langsung gunakan **.env.example** yang ada pada folder service dengan cara mengubah nama **.env.example** -> **.env**)
-- PORT: 3002
-- DATABASE_URL: sqlite:./course.db
-- NODE_ENV: development
-5. Enrollment-Service: (Bisa langsung gunakan **.env.example** yang ada pada folder service dengan cara mengubah nama **.env.example** -> **.env**)
-- PORT: 3003
-- API_GATEWAY_URL: http://localhost:3000
-- DATABASE_URL: sqlite:./enrollment.db
-- NODE_ENV: development
-7. Notification-Service: (Bisa langsung gunakan **.env.example** yang ada pada folder service dengan cara mengubah nama **.env.example** -> **.env**)
-- PORT: 3005
-- API_GATEWAY_URL: http://localhost:3000
-- DATABASE_URL: sqlite:./notification.db
-- NODE_ENV: development
-9. Progress-Service: (Bisa langsung gunakan **.env.example** yang ada pada folder service dengan cara mengubah nama **.env.example** -> **.env**)
-- PORT: 3004
-- API_GATEWAY_URL: http://localhost:3000
-- DATABASE_URL: sqlite:./progress.db
-- NODE_ENV: development
-11. User-Service: (Bisa langsung gunakan **.env.example** yang ada pada folder service dengan cara mengubah nama **.env.example** -> **.env**)
-- PORT: 3001
-- JWT_SECRET: rahasia_super_aman_ganti_ini **(atau ganti sesuai keiinginan)**
-- DATABASE_URL: sqlite:./user.db
-- NODE_ENV: development
+  - PORT: 3000
+  - JWT_SECRET: rahasia_super_aman_ganti_ini **(atau ganti sesuai keiinginan)**
+  - CORS_ORIGIN: http://localhost:5000
+  - USER_SERVICE_URL: http://localhost:3001
+  - COURSE_SERVICE_URL: http://localhost:3002
+  - ENROLLMENT_SERVICE_URL: http://localhost:3003
+  - PROGRESS_SERVICE_URL: http://localhost:3004
+  - NOTIFICATION_SERVICE_URL: http://localhost:3005
+  - NODE_ENV: development **(Sesuaikan)**
+2. Course-Service: (Bisa langsung gunakan **.env.example** yang ada pada folder service dengan cara mengubah nama **.env.example** -> **.env**)
+  - PORT: 3002
+  - DATABASE_URL: sqlite:./course.db
+  - NODE_ENV: development
+3. Enrollment-Service: (Bisa langsung gunakan **.env.example** yang ada pada folder service dengan cara mengubah nama **.env.example** -> **.env**)
+  - PORT: 3003
+  - API_GATEWAY_URL: http://localhost:3000
+  - DATABASE_URL: sqlite:./enrollment.db
+  - NODE_ENV: development
+4. Notification-Service: (Bisa langsung gunakan **.env.example** yang ada pada folder service dengan cara mengubah nama **.env.example** -> **.env**)
+  - PORT: 3005
+  - API_GATEWAY_URL: http://localhost:3000
+  - DATABASE_URL: sqlite:./notification.db
+  - NODE_ENV: development
+5. Progress-Service: (Bisa langsung gunakan **.env.example** yang ada pada folder service dengan cara mengubah nama **.env.example** -> **.env**)
+  - PORT: 3004
+  - API_GATEWAY_URL: http://localhost:3000
+  - DATABASE_URL: sqlite:./progress.db
+  - NODE_ENV: development
+6. User-Service: (Bisa langsung gunakan **.env.example** yang ada pada folder service dengan cara mengubah nama **.env.example** -> **.env**)
+  - PORT: 3001
+  - JWT_SECRET: rahasia_super_aman_ganti_ini **(atau ganti sesuai keiinginan)**
+  - DATABASE_URL: sqlite:./user.db
+  - NODE_ENV: development
 
 
 # Anggota & Peran
