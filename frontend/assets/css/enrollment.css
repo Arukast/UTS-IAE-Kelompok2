@@ -1,0 +1,63 @@
+/* enrollment.css */
+
+/* --- Sidebar Styling Khusus Materi --- */
+.sidebar-enrollments #course-title-sidebar {
+  font-size: 1rem;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+}
+
+.sidebar-enrollments #current-lesson-info {
+  font-size: 0.85rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-enrollments .lesson-item {
+  cursor: pointer;
+  border: none;
+  padding: 8px 10px;
+  margin-bottom: 2px;
+  transition: all 0.2s;
+  border-radius: var(--border-radius-sm);
+}
+
+.sidebar-enrollments .lesson-item:hover:not(.active-lesson) {
+  background-color: var(--primary-light);
+}
+
+.sidebar-enrollments .lesson-item.active-lesson {
+  background-color: var(--primary-color);
+  color: white;
+  box-shadow: var(--shadow-light);
+}
+
+.sidebar-enrollments .lesson-item.active-lesson a {
+  font-weight: 600;
+}
+
+/* --- Content Styling --- */
+
+/* Kontainer utama untuk video/embed */
+#lesson-content-container {
+  background: var(--surface-color);
+  border-radius: var(--border-radius-md);
+  overflow: hidden; /* Penting untuk video ratio */
+}
+
+/* Styling untuk konten Teks/Quiz */
+.lesson-text-content h4,
+.lesson-quiz-content h4 {
+  color: var(--primary-dark);
+}
+
+/* Tombol Navigasi */
+.button-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.button-navigation .btn-lg {
+  min-width: 250px; /* Lebar tombol "Tandai Selesai" agar menonjol */
+}
