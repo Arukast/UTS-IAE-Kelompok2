@@ -208,35 +208,52 @@ sequenceDiagram
 
 # Ringkasan Endpoint & Dokumentasi API
 ## User Service
-| Method  |         Endpoint          |         Deskripsi         |
-|---------|---------------------------|---------------------------|
-|  GET    |       `npm run`    |           Test            |
+| Method  |         Endpoint          |                                   Deskripsi                                      |
+|---------|---------------------------|----------------------------------------------------------------------------------|
+|  POST   |       `/auth/register`    | Mendaftarkan user baru (username, email, password)                               |
+|  POST   |       `/auth/login`       | Login user (email, password) dan mengembalikan JWT                               |
+|  GET    |       `/:id`              | Mendapatkan detail data seorang user (hanya data aman)                           |
+|  PUT    |       `/:id`              | Memperbarui data user (username, email). Hanya admin atau pemilik akun yang bisa |
+|  GET    |       `/health`           | Health check untuk layanan                                                       |
 
 ---
 
 ## Course Service
-| Method  |         Endpoint          |         Deskripsi         |
-|---------|---------------------------|---------------------------|
-|  GET    |       `npm run `    |           Test            |
+| Method  |               Endpoint                |                                   Deskripsi                                          |
+|---------|---------------------------------------|--------------------------------------------------------------------------------------|
+|  POST   |       `/`                             | Membuat kursus baru. Hanya untuk instructor atau admin                               |
+|  GET    |       `/`                             | Mendapatkan daftar semua kursus yang tersedia                                        |
+|  GET    |       `/:id`                          | Mendapatkan detail satu kursus, lengkap dengan modul dan materi (lesson) di dalamnya |
+|  PUT    |       `/:id`                          | Memperbarui data kursus. Hanya untuk admin atau instruktur pemilik                   |
+|  POST   |       `/:courseId/modules`            | Menambahkan modul baru ke kursus yang spesifik                                       |
+|  POST   |       `/modules/:moduleId/lessons`    | Menambahkan materi (lesson) baru ke modul yang spesifik                              |
+|  GET    |       `/health`                       | Health check untuk layanan                                                           |
 
 ---
 
 ## Progress Service
-| Method  |         Endpoint          |         Deskripsi         |
-|---------|---------------------------|---------------------------|
-|  GET    |       `npm run`    |           Test            |
+| Method  |            Endpoint            |                             Deskripsi                                   |
+|---------|--------------------------------|-------------------------------------------------------------------------|
+|  POST   |       `/lessons/complete`      | Menandai sebuah materi (lesson) telah selesai oleh user                 |
+|  GET    |       `/my-progress/:courseId` | Mengambil data progres user (materi selesai & nilai) di kursus tertentu |
+|  GET    |       `/health`                | Health check untuk layanan                                              |
 
 ---
 
 ## Enrollment Service
-| Method  |         Endpoint          |         Deskripsi         |
-|---------|---------------------------|---------------------------|
-|  GET    |       `npm run`    |           Test            |
+| Method  |             Endpoint             |                                         Deskripsi                                         |
+|---------|----------------------------------|-------------------------------------------------------------------------------------------|
+|  POST   |       `/:courseId`               | Mendaftarkan user (yang ada di token) ke kursus berdasarkan courseId                      |
+|  GET    |       `/my-enrollments`          | Mengambil daftar semua kursus yang telah diambil oleh user (dari token)                   |
+|  GET    |       `/course-roster/:courseId` | (Instruktur/Admin) Melihat daftar user yang mendaftar di kursus tertentu                  |
+|  GET    |       `/check`                   | (Internal) Memeriksa apakah user terdaftar (aktif) di kursus. Digunakan oleh layanan lain |
+|  GET    |       `/health`                  | Health check untuk layanan                                                                |
 
 ---
 
 # API Gateway
-| Method  |         Endpoint          |         Target         |
-|---------|---------------------------|---------------------------|
-|  GET    |       `npm run nigeeeerrrrrrrrr`    |           Test            |
+| Method  |         Endpoint          |         Target           |
+|---------|---------------------------|--------------------------|
+|  GET    |       `/health`           |   API Gateway (Lokal)    |
+|  Any    |       `/api/auth/*`       | User Service (Port 3001) |
 
